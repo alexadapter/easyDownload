@@ -3,12 +3,12 @@ package com.github.lisicnu.easydownload.core;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.github.lisicnu.easydownload.feeds.BaseFeed;
 import com.github.lisicnu.easydownload.feeds.DbFeed;
 import com.github.lisicnu.easydownload.feeds.DownloadingFeed;
 import com.github.lisicnu.easydownload.feeds.ProgressFeed;
-import com.github.lisicnu.log4android.LogManager;
 import com.github.lisicnu.libDroid.util.StringUtils;
 
 import java.util.ArrayList;
@@ -151,7 +151,7 @@ public class DBAccess {
                 db.execSQL(buffer.toString(), args);
 
             } catch (Exception e) {
-                LogManager.e(TAG.concat("---deleteDownload"), e);
+                Log.e(TAG, "deleteDownload", e);
             }
         }
     }
@@ -196,7 +196,7 @@ public class DBAccess {
                 db.execSQL(buffer.toString(), new Object[]{url});
                 db.setTransactionSuccessful();
             } catch (Exception e) {
-                LogManager.e(TAG, "deleteTask:".concat(e.toString()));
+                Log.e(TAG, "deleteTask", e);
             } finally {
                 db.endTransaction();
                 if (cursor != null) {
@@ -254,7 +254,7 @@ public class DBAccess {
 
                 db.execSQL(buffer.toString(), val);
             } catch (Exception e) {
-                LogManager.e(TAG, "updateDBKey:".concat(e.toString()));
+                Log.e(TAG, "updateDBKey", e);
             }
         }
     }
@@ -279,7 +279,7 @@ public class DBAccess {
 
                 db.execSQL(buffer.toString(), new Object[]{fileSize, id});
             } catch (Exception e) {
-                LogManager.e(TAG, "updateDbFileSize:".concat(e.toString()));
+                Log.e(TAG, "updateDbFileSize", e);
             }
         }
     }
@@ -305,7 +305,7 @@ public class DBAccess {
                 db.execSQL(buffer.toString(),
                         new Object[]{DbFeed.parseServersToStr(servers), id});
             } catch (Exception e) {
-                LogManager.e(TAG, "updateDbServers:".concat(e.toString()));
+                Log.e(TAG, "updateDbServers", e);
             }
         }
     }
@@ -330,7 +330,7 @@ public class DBAccess {
 
                 db.execSQL(buffer.toString(), new Object[]{curPos, id});
             } catch (Exception e) {
-                LogManager.e(TAG, "updateDb:".concat(e.toString()));
+                Log.e(TAG, "updateDb", e);
             }
         }
     }
@@ -356,7 +356,7 @@ public class DBAccess {
 
                 db.execSQL(buffer.toString(), new Object[]{status, url});
             } catch (Exception e) {
-                LogManager.e(TAG, "updateTaskState:".concat(e.toString()));
+                Log.e(TAG, "updateTaskState", e);
                 return false;
             }
             return true;
@@ -405,7 +405,7 @@ public class DBAccess {
                                 String.valueOf(System.currentTimeMillis()), url}
                 );
             } catch (Exception e) {
-                LogManager.e(TAG, "taskEnd:".concat(e.toString()));
+                Log.e(TAG, "taskEnd", e);
             } finally {
                 if (cursor != null) {
                     cursor.close();
@@ -441,7 +441,7 @@ public class DBAccess {
                 }
             } catch (Exception e) {
                 result = false;
-                LogManager.e(TAG, "isTaskExist:".concat(e.toString()));
+                Log.e(TAG, "isTaskExist", e);
             } finally {
                 if (cursor != null) {
                     cursor.close();
@@ -511,9 +511,9 @@ public class DBAccess {
      *
      * @param items
      */
-    public void addTask(DbFeed... items) {
+    public boolean addTask(DbFeed... items) {
         if (getDB() == null || !getDB().isOpen() || items == null || items.length == 0)
-            return;
+            return false;
 
         synchronized (mLocker) {
             db.beginTransaction();
@@ -547,8 +547,10 @@ public class DBAccess {
 
                 }
                 db.setTransactionSuccessful();
+                return true;
             } catch (Exception e) {
-                LogManager.e(getClass().getSimpleName(), "addTask:".concat(e.toString()));
+                Log.e(TAG, "addTask", e);
+                return false;
             } finally {
                 db.endTransaction();
             }
@@ -577,8 +579,7 @@ public class DBAccess {
                 cursor = db.rawQuery(buffer.toString(), new String[]{downPath});
                 items = parseItems(cursor);
             } catch (Exception e) {
-                LogManager.e(TAG.concat("getTaskItems"), "downPath= ".concat(downPath).concat(":  ")
-                        .concat(e.toString()));
+                Log.e(TAG, "getTaskItems,downPath="+downPath, e);
             } finally {
                 if (cursor != null) {
                     cursor.close();
@@ -718,7 +719,7 @@ public class DBAccess {
                 cursor = db.rawQuery(buffer.toString(), args);
             } catch (Exception e) {
                 cursor = null;
-                LogManager.e(getClass().getSimpleName(), "queryDownload:".concat(e.toString()));
+                Log.e(TAG, "queryDownload", e);
             }
             return cursor;
         }
@@ -751,7 +752,7 @@ public class DBAccess {
                 cursor = queryDownload(where, orderby, groupBy, limit, args);
                 items = parseItems(cursor);
             } catch (Exception e) {
-                LogManager.e(getClass().getSimpleName(), "findDownload:".concat(e.toString()));
+                Log.e(TAG, "findDownload", e);
             } finally {
                 if (cursor != null) {
                     cursor.close();
@@ -846,7 +847,7 @@ public class DBAccess {
                 cursor.close();
                 cursor = null;
             } catch (Exception e) {
-                LogManager.e(getClass().getSimpleName(), "findItems:".concat(e.toString()));
+                Log.e(TAG, "findItems", e);
             } finally {
                 if (cursor != null) {
                     cursor.close();
@@ -932,7 +933,7 @@ public class DBAccess {
                 result = true;
             } catch (Exception e) {
                 result = false;
-                LogManager.e(getClass().getName(), "addTaskItems:".concat(e.toString()));
+                Log.e(TAG, "addTaskItems", e);
             } finally {
                 db.endTransaction();
                 if (cursor != null) {
@@ -1104,7 +1105,7 @@ public class DBAccess {
                 cursor = db.rawQuery(buffer.toString(), args);
             } catch (Exception e) {
                 cursor = null;
-                LogManager.e(TAG, "queryDownloading:".concat(e.toString()));
+                Log.e(TAG, "queryDownloading", e);
             }
             return cursor;
         }
@@ -1162,7 +1163,7 @@ public class DBAccess {
                 cursor = null;
 
             } catch (Exception e) {
-                LogManager.e(TAG, "findDownloading:".concat(e.toString()));
+                Log.e(TAG, "findDownloading", e);
             } finally {
                 if (cursor != null) {
                     cursor.close();

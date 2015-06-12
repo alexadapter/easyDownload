@@ -2,6 +2,7 @@ package com.github.lisicnu.easydownload.core;
 
 import android.content.Context;
 import android.os.SystemClock;
+import android.util.Log;
 import android.webkit.URLUtil;
 
 import com.github.lisicnu.easydownload.feeds.BaseFeed;
@@ -14,7 +15,6 @@ import com.github.lisicnu.libDroid.util.FileUtils;
 import com.github.lisicnu.libDroid.util.MiscUtils;
 import com.github.lisicnu.libDroid.util.StringUtils;
 import com.github.lisicnu.libDroid.util.URLUtils;
-import com.github.lisicnu.log4android.LogManager;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -847,7 +847,7 @@ public class DownloadPool {
             isPause = false;
         }
 
-        LogManager.v(TAG, "after remove,queue/task=" + taskQueue.size() + "/" + tasks.size());
+//        Log.e(TAG, "after remove, queue/task=" + taskQueue.size() + "/" + tasks.size());
     }
 
     /**
@@ -981,9 +981,9 @@ public class DownloadPool {
 
     private void log(String msg, boolean isInfo) {
         if (isInfo)
-            LogManager.i(TAG, msg);
+            Log.i(TAG, msg);
         else {
-            LogManager.v(TAG, msg);
+            Log.v(TAG, msg);
         }
     }
 
@@ -1140,7 +1140,7 @@ public class DownloadPool {
                             // 如果 任务的有效时间超出了....那么就自动移除...
                             if (task.lastTime > 0
                                     && (System.currentTimeMillis() - task.getDbFeed().getAddTime() > task.lastTime)) {
-                                LogManager.e(TAG, "task has been over. " + task.lastTime + "  "
+                                Log.e(TAG, "task has expired. " + task.lastTime + "  "
                                         + task.getDbFeed().getDownloadUrl());
                                 continue;
                             }
@@ -1172,7 +1172,7 @@ public class DownloadPool {
                         resumeCacheItems(0);
 
                     if (taskQueue.isEmpty()) {
-//                          LogManager.d(TAG, "empty,start await .... " + taskQueue.size());
+//                          Log.d(TAG, "empty,start await .... " + taskQueue.size());
                         try {
                             taskQueueLocker.lock();
                             taskQueueEmptyCondition.await();
@@ -1180,7 +1180,7 @@ public class DownloadPool {
                             e.printStackTrace();
                         } finally {
                             taskQueueLocker.unlock();
-//                            LogManager.d(TAG, "not empty,exit await. " + taskQueue.size());
+//                            Log.d(TAG, "not empty,exit await. " + taskQueue.size());
                         }
 
 //                        try {
@@ -1819,7 +1819,7 @@ public class DownloadPool {
                     try {
                         Thread.sleep(getDbFeed().getRetryWaitMills());
                     } catch (InterruptedException e) {
-                        LogManager.d(TAG + " retryDownload", e.toString());
+                        Log.e(TAG, "retryDownload", e);
                     }
 
                     if (stop)

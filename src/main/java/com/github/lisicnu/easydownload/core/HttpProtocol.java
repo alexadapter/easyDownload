@@ -1,10 +1,10 @@
 package com.github.lisicnu.easydownload.core;
 
 import android.os.SystemClock;
+import android.util.Log;
 
 import com.github.lisicnu.easydownload.feeds.DownloadingFeed;
 import com.github.lisicnu.easydownload.protocol.IDownloadProtocol;
-import com.github.lisicnu.log4android.LogManager;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -99,7 +99,7 @@ public class HttpProtocol implements IDownloadProtocol {
                 try {
                     rndFile.write(buffer, 0, readLen);
                 } catch (Exception e) {
-                    LogManager.e(TAG, item.getId() + e.toString());
+                    Log.e(TAG, item.getId() + e.toString());
                     if (!saveFile.exists() || !saveFile.canWrite()) {
                         return code = DBAccess.STATUS_DOWNLOAD_ERROR_WRITEFILE;
                     } else {
@@ -121,7 +121,7 @@ public class HttpProtocol implements IDownloadProtocol {
                 }
 
                 if (item.getEndPos() > 0 && item.getCurPos() > item.getEndPos()) {
-//                    LogManager.e(TAG, "out of range..... end/cur=" + item.getEndPos() + "/" + item.getCurPos());
+//                    Log.e(TAG, "out of range..... end/cur=" + item.getEndPos() + "/" + item.getCurPos());
                     break;
                 }
 
@@ -135,7 +135,7 @@ public class HttpProtocol implements IDownloadProtocol {
                 code = DBAccess.STATUS_DOWNLOAD_PAUSED;
             }
         } catch (Exception e) {
-            LogManager.e(TAG, getClass().getName() + ":" + e.toString());
+            Log.e(TAG, "", e);
             code = DBAccess.STATUS_DOWNLOAD_ERROR_UNKNOW;
         } finally {
             if (httpGet != null) {

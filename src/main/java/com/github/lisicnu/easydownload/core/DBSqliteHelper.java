@@ -4,8 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
-import com.github.lisicnu.log4android.LogManager;
 import com.github.lisicnu.libDroid.util.StringUtils;
 
 import java.util.HashMap;
@@ -167,7 +167,7 @@ public class DBSqliteHelper extends SQLiteOpenHelper {
                 addCol(db, TABLE_ALL, st, maps.get(st));
             }
         } catch (Exception e) {
-            LogManager.e("oncreatedb", e);
+            Log.e("DBSqliteHelper", "oncreatedb", e);
         } finally {
             if (cursor != null) {
                 cursor.close();
