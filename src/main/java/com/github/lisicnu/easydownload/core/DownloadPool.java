@@ -27,6 +27,7 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
 import java.io.File;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -247,6 +248,8 @@ public class DownloadPool {
      */
     public void setAutoResumeFilter(String filter) {
         this.autoResumeFilter = filter;
+
+        notifyTaskQueue();
     }
 
     /**
@@ -326,6 +329,11 @@ public class DownloadPool {
         return isPause;
     }
 
+    /**
+     * 返回正在下载的列表, (文件的下载地址)不包含数据库中待下载但未下载的.
+     *
+     * @return
+     */
     public List<String> getDownloadingItems() {
         Iterator<DownloadTask> ite = tasks.iterator();
         List<String> items = new ArrayList<String>(tasks.size());
@@ -613,7 +621,11 @@ public class DownloadPool {
         // log("item added: " + task.dbFeed.getDownloadUrl(), false);
     }
 
-    void notifyTaskQueue() {
+    /**
+     * This is for call download resume. When download queue is modified,
+     * call this method immediately.
+     */
+    public void notifyTaskQueue() {
         try {
             taskQueueLocker.lock();
             taskQueueEmptyCondition.signal();
@@ -1324,6 +1336,7 @@ public class DownloadPool {
                     }
                 }
             }
+            log("DownloadUrlRight=" + downloadUrlRight, false);
         }
 
         HttpClient client = null;
@@ -1348,6 +1361,7 @@ public class DownloadPool {
                 HttpResponse httpResp = client.execute(httpHead);
                 // 判断是够请求成功
                 int statusCode = httpResp.getStatusLine().getStatusCode();
+                log("statusCode=" + statusCode, false);
                 if (statusCode == HttpStatus.SC_OK) {
                     // 获取返回的数据
                     if (getFileSize() == -1) {
@@ -1363,9 +1377,34 @@ public class DownloadPool {
                                     getFileSize());
                         }
                     }
+                    log("filesize=" + fileSize, false);
 
                     downURL = url;
                     result = true;
+                } else if (statusCode == HttpStatus.SC_MOVED_PERMANENTLY || statusCode == HttpStatus.SC_MOVED_TEMPORARILY) {
+                    fileSize = IO_SINGLE_READ_2_END;
+                    downURL = url;
+                    result = true;
+                } else {
+                    try {
+                        HttpURLConnection connection = URLUtils.getNormalCon(url);
+                        connection.connect();
+                        if (connection.getResponseCode() == 200) {
+                            fileSize = connection.getContentLength();
+                            downURL = url;
+                            result = true;
+                        } else {
+                            if (connection.getResponseCode() == 301 || connection.getResponseCode()
+                                    == 302) {
+                                fileSize = IO_SINGLE_READ_2_END;
+                                downURL = url;
+                                result = true;
+                            }
+                        }
+                        connection.disconnect();
+                    } catch (Exception e) {
+                        log(e.toString(), false);
+                    }
                 }
 
             } catch (Exception e) {
@@ -1591,12 +1630,8 @@ public class DownloadPool {
 
                 analysisDownloadable();
 
-                // log("downloadUrlRight=" + downloadUrlRight + "|getDbFeed().getDownloadUrl():" +
-                // getDbFeed().getDownloadUrl() + "|download url: " + downURL, false);
-
                 if (!downloadUrlRight) {
                     onTaskFailed(getDbFeed(), DBAccess.STATUS_DOWNLOAD_ERROR_HTTP);
-//                    onAnalysisURLFailed();
                     return;
                 }
 
@@ -1605,9 +1640,6 @@ public class DownloadPool {
                             "获取文件大小失败了");
 
                     onTaskFailed(getDbFeed(), DBAccess.STATUS_DOWNLOAD_ERROR_HTTP);
-
-//                    removeTask(this);
-//                    onTaskStateChanged(getDbFeed(), DBAccess.STATUS_DOWNLOAD_ERROR_HTTP);
                     return;
                 }
 
@@ -1633,20 +1665,14 @@ public class DownloadPool {
                                     "磁盘剩余空间不足");
 
                             onTaskFailed(getDbFeed(), DBAccess.STATUS_DOWNLOAD_ERROR_NOSTORAGE);
-//                            onTaskStateChanged(getDbFeed(), DBAccess.STATUS_DOWNLOAD_ERROR_NOSTORAGE);
-//                            removeTask(this);
 
                             removedAllUnStartedTask();
-
                             return;
                         } else if (val == FileUtils.CREATE_NEW_FILE_FAILED) {
                             onMessage(getDbFeed(), IDownloadListener.MSG_CODE_CREATE_FILE_FAILED,
                                     "文件创建失败");
 
                             onTaskFailed(getDbFeed(), DBAccess.STATUS_DOWNLOAD_ERROR_WRITEFILE);
-
-//                            onTaskStateChanged(getDbFeed(), DBAccess.STATUS_DOWNLOAD_ERROR_WRITEFILE);
-//                            removeTask(this);
                             return;
                         }
                     }
@@ -1713,8 +1739,10 @@ public class DownloadPool {
                 return;
 
             int threadCount = getDbFeed().getThreadCount();
-            if (getFileSize() < getDbFeed().getIgnoreSize() && getDbFeed().getIgnoreSize() > 0) {
+            if ((getFileSize() == IO_SINGLE_READ_2_END) || (getFileSize() < getDbFeed()
+                    .getIgnoreSize() && getDbFeed().getIgnoreSize() > 0)) {
                 // if file size is less than 4M, will use one thread.
+                // if file size is unknown, will use one thread.
                 threadCount = 1;
             }
 

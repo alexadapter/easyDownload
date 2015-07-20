@@ -72,7 +72,8 @@ public class HttpProtocol implements IDownloadProtocol {
             HttpConnectionParams.setSoTimeout(httpParameters, 30000);
             client = new DefaultHttpClient(httpParameters);
             httpGet = new HttpGet(task.downURL);
-            httpGet.addHeader("Range", "bytes=" + curPos + "-" + item.getEndPos());
+            httpGet.addHeader("Range", "bytes=" + curPos + "-" + (item.getEndPos() <= 0 ? "" : item
+                    .getEndPos()));
 
             HttpResponse response = client.execute(httpGet);
             inStream = response.getEntity().getContent();

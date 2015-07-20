@@ -29,5 +29,5 @@ dependencies {
 //        compile project(':log4android')
 //        compile project(':libDroid')
 //    compile 'com.github.lisicnu:log4android:1.0.3'
-    compile 'com.github.lisicnu:droidUtil:0.1.6'
+    compile 'com.github.lisicnu:droidUtil:0.1.7'
 }
