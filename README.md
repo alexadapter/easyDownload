@@ -12,16 +12,16 @@ easyDownload
 
 ##gradle使用说明##
 
-compile 'com.github.lisicnu:easyDownload:0.1.2'
+compile 'com.github.lisicnu:easyDownload:0.1.9'
 
 
 // 内部已经自动引用  
 
 
-// compile 'com.github.lisicnu:droidUtil:0.1.3'
+// compile 'com.github.lisicnu:droidUtil:0.1.7'
 
 
-// compile 'com.github.lisicnu:log4android:1.0.1'
+// compile 'com.github.lisicnu:log4android:1.0.4'
 
 
 ##Future##
