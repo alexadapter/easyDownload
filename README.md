@@ -8,16 +8,6 @@ easyDownload
 
 使用前调用 DownloadPool.init(context); 进行初始化, 之后将可以开始下载.
 
-##发布地址变更##
-从 0.1.9 之后的版本将发布在 jitpack.io, 使用方式: 加入新的maven仓库地址.
-
-repositories {
-    maven {
-        url "https://jitpack.io"
-    }
-    mavenCentral()
-}
-
 
 
 ##gradle使用说明##
