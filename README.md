@@ -12,7 +12,7 @@ easyDownload
 
 ##gradle使用说明##
 
-compile 'com.github.lisicnu:easyDownload:0.1.9'
+compile 'com.github.lisicnu:easyDownload:0.2.0'
 
 
 // 内部已经自动引用  
