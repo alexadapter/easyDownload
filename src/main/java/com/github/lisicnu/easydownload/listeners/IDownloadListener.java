@@ -33,8 +33,9 @@ public interface IDownloadListener {
     /**
      * 开始下载任务之前执行, 用来执行用户动作... [e.g.如文件版本信息比较, 更改下载地址等].
      *
+     *
      * @param feed
-     * @return 返回是否应该继续下载.. 默认需要返回true
+     * @return 返回是否应该继续下载.. 默认需要返回true, [会对所有的listener进行与操作.]
      */
     boolean onStart(BaseFeed feed);
 
@@ -60,9 +61,10 @@ public interface IDownloadListener {
      * @param msgCode
      * @param msg
      */
+    @Deprecated
     void onMessage(BaseFeed feed, int msgCode, String msg);
 
-    public final int MSG_CODE_GET_FILE_SIZE_FAILD = 0x1;
+    public final int MSG_CODE_GET_FILE_SIZE_FAILED = 0x1;
     public final int MSG_CODE_STORAGE_NOT_ENOUGH = 0x2;
     public final int MSG_CODE_CREATE_FILE_FAILED = 0x3;
 }

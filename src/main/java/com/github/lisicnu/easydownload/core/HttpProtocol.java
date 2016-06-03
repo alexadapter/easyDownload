@@ -17,6 +17,7 @@ import org.apache.http.params.HttpParams;
 import java.io.File;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
+import java.util.Iterator;
 
 /**
  * <p/>
@@ -57,6 +58,22 @@ public class HttpProtocol implements IDownloadProtocol {
         limitSpeed = speed * 1024;
     }
 
+    private String getFirstServer() {
+        if (task.serverStatus.isEmpty())
+            return "";
+
+        Iterator<String> set = task.serverStatus.keySet().iterator();
+        while (set.hasNext()) {
+            String t = set.next();
+            int status = task.serverStatus.get(t);
+            if (status == 0 || status == 1) {
+                return t;
+            }
+        }
+
+        return null;
+    }
+
     @Override
     public int download() {
         int code = DBAccess.STATUS_DOWNLOAD_SUCCESS;
@@ -71,7 +88,8 @@ public class HttpProtocol implements IDownloadProtocol {
             HttpConnectionParams.setConnectionTimeout(httpParameters, 10000);
             HttpConnectionParams.setSoTimeout(httpParameters, 30000);
             client = new DefaultHttpClient(httpParameters);
-            httpGet = new HttpGet(task.downURL);
+            httpGet = new HttpGet(getFirstServer());
+            Log.e(TAG, "server:" + httpGet.getURI());
             httpGet.addHeader("Range", "bytes=" + curPos + "-" + (item.getEndPos() <= 0 ? "" : item
                     .getEndPos()));
 
@@ -85,11 +103,7 @@ public class HttpProtocol implements IDownloadProtocol {
             rndFile.seek(curPos);
 
             // TODO 第一次更新的时间短一点, 防止同时刷新大量数据, 尽量防止同一时间更新数据库.
-            long tmpLastUpdateTime = System.currentTimeMillis() - item.getId()
-                    % task.getDbFeed().getThreadCount() * 200;
-
             while (!stopDownload) {
-
                 readLen = inStream.read(buffer, 0, buffer.length);
                 if (readLen <= 0 || stopDownload) break;
 
@@ -112,14 +126,7 @@ public class HttpProtocol implements IDownloadProtocol {
                 curPos += readLen;
                 item.setCurPos(curPos);
 
-                if (System.currentTimeMillis() - tmpLastUpdateTime > DownloadPool.getInstance
-                        ().getUpdateTime()) {
-
-                    task.onTaskSaveProgress(item.getId(), curPos);
-                    task.onTaskProgress();
-
-                    tmpLastUpdateTime = System.currentTimeMillis();
-                }
+                task.onTaskProgress();
 
                 if (item.getEndPos() > 0 && item.getCurPos() > item.getEndPos()) {
 //                    Log.e(TAG, "out of range..... end/cur=" + item.getEndPos() + "/" + item.getCurPos());

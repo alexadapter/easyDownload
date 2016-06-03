@@ -50,7 +50,9 @@ public class DBAccess {
     public static final int STATUS_DOWNLOAD_SUCCESS = 4;
     /**
      * 分析下载地址
+     * not used any more.
      */
+    @Deprecated()
     public static final int STATUS_DOWNLOAD_ANALYSIS_URL = 10;
     /**
      * 下载失败 MASK
@@ -579,7 +581,7 @@ public class DBAccess {
                 cursor = db.rawQuery(buffer.toString(), new String[]{downPath});
                 items = parseItems(cursor);
             } catch (Exception e) {
-                Log.e(TAG, "getTaskItems,downPath="+downPath, e);
+                Log.e(TAG, "getTaskItems,downPath=" + downPath, e);
             } finally {
                 if (cursor != null) {
                     cursor.close();
@@ -833,6 +835,13 @@ public class DBAccess {
                     }
                     if (!cursor.isNull(cols[counter]))
                         item.setEndPos(cursor.getInt(cols[counter]));
+                    counter++;
+
+                    if (cols[counter] == INVALIDVALUE) {
+                        cols[counter] = cursor.getColumnIndex(DBSqliteHelper.T_COL_STARTPOS);
+                    }
+                    if (!cursor.isNull(cols[counter]))
+                        item.setStartPos(cursor.getInt(cols[counter]));
                     counter++;
 
                     if (cols[counter] == INVALIDVALUE) {

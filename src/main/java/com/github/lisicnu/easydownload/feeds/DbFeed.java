@@ -82,4 +82,5 @@ public class DbFeed extends BaseFeed {
     public void setAddTime(long addTime) {
         this.addTime = addTime;
     }
+
 }

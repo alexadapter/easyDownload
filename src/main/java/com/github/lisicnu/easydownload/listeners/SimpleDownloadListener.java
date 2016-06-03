@@ -32,6 +32,7 @@ public class SimpleDownloadListener implements IDownloadListener {
 
     }
 
+    @Deprecated
     @Override
     public void onMessage(BaseFeed feed, int msgCode, String msg) {
 
