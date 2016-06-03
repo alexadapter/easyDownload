@@ -3,13 +3,13 @@ package com.github.lisicnu.easydownload.core;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.github.lisicnu.easydownload.feeds.BaseFeed;
 import com.github.lisicnu.easydownload.feeds.DbFeed;
 import com.github.lisicnu.easydownload.feeds.DownloadingFeed;
 import com.github.lisicnu.easydownload.feeds.ProgressFeed;
-import com.github.lisicnu.libDroid.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -135,7 +135,7 @@ public class DBAccess {
      * @param args
      */
     public void deleteDownload(String where, Object[] args) {
-        if (getDB() == null || !getDB().isOpen() || StringUtils.isNullOrEmpty(where))
+        if (getDB() == null || !getDB().isOpen() || TextUtils.isEmpty(where))
             return;
 
         synchronized (mLocker) {
@@ -144,7 +144,7 @@ public class DBAccess {
 
                 buffer.append("delete from ").append(DBSqliteHelper.TABLE_ALL);
 
-                if (!StringUtils.isNullOrEmpty(where)) {
+                if (!TextUtils.isEmpty(where)) {
                     buffer.append(" where ").append(where);
                 }
 
@@ -163,7 +163,7 @@ public class DBAccess {
      * @return
      */
     public boolean deleteTask(String url) {
-        if (getDB() == null || !getDB().isOpen() || StringUtils.isNullOrEmpty(url))
+        if (getDB() == null || !getDB().isOpen() || TextUtils.isEmpty(url))
             return false;
 
         synchronized (mLocker) {
@@ -221,7 +221,7 @@ public class DBAccess {
      * @param values
      */
     public void updateDBKey(String url, Map<String, Object> values) {
-        if (getDB() == null || !getDB().isOpen() || StringUtils.isNullOrEmpty(url) || values == null || values
+        if (getDB() == null || !getDB().isOpen() || TextUtils.isEmpty(url) || values == null || values
                 .isEmpty())
             return;
 
@@ -343,7 +343,7 @@ public class DBAccess {
      * @return
      */
     public boolean updateTaskState(String url, int status) {
-        if (getDB() == null || !getDB().isOpen() || StringUtils.isNullOrEmpty(url))
+        if (getDB() == null || !getDB().isOpen() || TextUtils.isEmpty(url))
             return false;
 
         synchronized (mLocker) {
@@ -369,7 +369,7 @@ public class DBAccess {
      * @param url 空或者 null 直接返回
      */
     protected void taskEnd(String url) {
-        if (getDB() == null || !getDB().isOpen() || StringUtils.isNullOrEmpty(url))
+        if (getDB() == null || !getDB().isOpen() || TextUtils.isEmpty(url))
             return;
 
         synchronized (mLocker) {
@@ -422,7 +422,7 @@ public class DBAccess {
      * @return if exist return true. otherwise return false.
      */
     public boolean isTaskExist(String url) {
-        if (getDB() == null || !getDB().isOpen() || StringUtils.isNullOrEmpty(url))
+        if (getDB() == null || !getDB().isOpen() || TextUtils.isEmpty(url))
             return false;
 
         synchronized (mLocker) {
@@ -477,7 +477,7 @@ public class DBAccess {
      * @return
      */
     public int findRefId(String downPath) {
-        if (getDB() == null || !getDB().isOpen() || StringUtils.isNullOrEmpty(downPath))
+        if (getDB() == null || !getDB().isOpen() || TextUtils.isEmpty(downPath))
             return INVALIDVALUE;
 
         synchronized (mLocker) {
@@ -564,7 +564,7 @@ public class DBAccess {
      * @return 如果當前返回值的size=0, 表示木有找到當前的信息, 需要重新添加
      */
     public List<DbFeed> getTaskItems(String downPath) {
-        if (getDB() == null || !getDB().isOpen() || StringUtils.isNullOrEmpty(downPath))
+        if (getDB() == null || !getDB().isOpen() || TextUtils.isEmpty(downPath))
             return new ArrayList<DbFeed>();
 
         List<DbFeed> items = new ArrayList<DbFeed>();
@@ -785,7 +785,7 @@ public class DBAccess {
      * @return
      */
     public List<DownloadingFeed> findItems(String url) {
-        if (getDB() == null || !getDB().isOpen() || StringUtils.isNullOrEmpty(url))
+        if (getDB() == null || !getDB().isOpen() || TextUtils.isEmpty(url))
             return new ArrayList<DownloadingFeed>();
 
         synchronized (mLocker) {

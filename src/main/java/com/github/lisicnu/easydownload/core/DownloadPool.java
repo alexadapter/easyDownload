@@ -2,6 +2,7 @@ package com.github.lisicnu.easydownload.core;
 
 import android.content.Context;
 import android.os.SystemClock;
+import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.URLUtil;
 
@@ -13,7 +14,6 @@ import com.github.lisicnu.easydownload.listeners.IDownloadListener;
 import com.github.lisicnu.easydownload.protocol.IDownloadProtocol;
 import com.github.lisicnu.libDroid.util.FileUtils;
 import com.github.lisicnu.libDroid.util.MiscUtils;
-import com.github.lisicnu.libDroid.util.StringUtils;
 import com.github.lisicnu.libDroid.util.URLUtils;
 
 import org.apache.http.Header;
@@ -35,10 +35,6 @@ import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-
-/**
- *
- */
 
 /**
  * 當調用了 {@link DownloadTask#stopDownload()} 之後, 如果需要重新開始下載,你需要重新實例化.
@@ -125,7 +121,7 @@ public class DownloadPool {
      * 将临时文件写成隐藏文件
      */
     private static synchronized String getTmpFileName(String fileName) {
-        if (StringUtils.isNullOrEmpty(fileName))
+        if (TextUtils.isEmpty(fileName))
             return fileName;
 
         fileName = "." + fileName;
@@ -287,7 +283,7 @@ public class DownloadPool {
             args = new String[]{String.valueOf(DBAccess.STATUS_NOTSTART)};
         }
 
-        if (!StringUtils.isNullOrEmpty(autoResumeFilter)) {
+        if (!TextUtils.isEmpty(autoResumeFilter)) {
             buffer.append(" and ").append(autoResumeFilter);
         }
 
@@ -351,7 +347,7 @@ public class DownloadPool {
      * @param url
      */
     public synchronized void pause(String url) {
-        if (StringUtils.isNullOrEmpty(url))
+        if (TextUtils.isEmpty(url))
             return;
 
         BaseFeed feed = removeFromPool(url, false);
@@ -368,7 +364,7 @@ public class DownloadPool {
      * @param url
      */
     public void resume(String url) {
-        if (StringUtils.isNullOrEmpty(url))
+        if (TextUtils.isEmpty(url))
             return;
 
         if (isExistInDownloadQueue(url)) {
@@ -396,7 +392,7 @@ public class DownloadPool {
      * @param url
      */
     public synchronized void retryDownload(String url) {
-        if (StringUtils.isNullOrEmpty(url))
+        if (TextUtils.isEmpty(url))
             return;
 
         log("retryItem:" + url, false);
@@ -417,7 +413,7 @@ public class DownloadPool {
      * @return
      */
     public boolean exist(String url) {
-        if (StringUtils.isNullOrEmpty(url))
+        if (TextUtils.isEmpty(url))
             return false;
 
         return isExistInDownloadQueue(url) || (getDBHelper() != null && getDBHelper().isTaskExist(url));
@@ -430,7 +426,7 @@ public class DownloadPool {
      * @return
      */
     private boolean isExistInDownloadQueue(String url) {
-        if (StringUtils.isNullOrEmpty(url))
+        if (TextUtils.isEmpty(url))
             return false;
 
         synchronized (locker) {
@@ -552,7 +548,7 @@ public class DownloadPool {
     }
 
     public void add(DbFeed item, boolean deleteExist) {
-        if (item == null || StringUtils.isNullOrEmpty(item.getDownloadUrl()))
+        if (item == null || TextUtils.isEmpty(item.getDownloadUrl()))
             return;
 
         TaskFeed feed = new TaskFeed();
@@ -641,7 +637,7 @@ public class DownloadPool {
      * @param deleteFile  是否删除已下载文件
      */
     public void deleteDownTask(String downloadUrl, boolean deleteFile) {
-        if (StringUtils.isNullOrEmpty(downloadUrl))
+        if (TextUtils.isEmpty(downloadUrl))
             return;
 
         log("deleteTask: " + downloadUrl, false);
@@ -683,7 +679,7 @@ public class DownloadPool {
      */
     private BaseFeed removeFromQueue(String downloadUrl, boolean deleteTmpFile) {
 
-        if (StringUtils.isNullOrEmpty(downloadUrl))
+        if (TextUtils.isEmpty(downloadUrl))
             return null;
 
         BaseFeed feed = null;
@@ -711,7 +707,7 @@ public class DownloadPool {
      * @return
      */
     private BaseFeed removeFromList(String downloadUrl, boolean deleteTmpFile) {
-        if (StringUtils.isNullOrEmpty(downloadUrl))
+        if (TextUtils.isEmpty(downloadUrl))
             return null;
 
         BaseFeed feed = null;
@@ -746,7 +742,7 @@ public class DownloadPool {
      */
     private BaseFeed removeFromPool(String downloadUrl, boolean deleteTmpFile) {
 
-        if (StringUtils.isNullOrEmpty(downloadUrl))
+        if (TextUtils.isEmpty(downloadUrl))
             return null;
 
         synchronized (locker) {
@@ -1308,7 +1304,7 @@ public class DownloadPool {
         }
 
         protected boolean isTempFileExist() {
-            if (StringUtils.isNullOrEmpty(getDbFeed().getFileName()))
+            if (TextUtils.isEmpty(getDbFeed().getFileName()))
                 return false;
 
             String tmp = getDbFeed().getFileName();
@@ -1338,6 +1334,7 @@ public class DownloadPool {
             }
             log("DownloadUrlRight=" + downloadUrlRight, false);
         }
+
 
         HttpClient client = null;
 
@@ -1792,7 +1789,7 @@ public class DownloadPool {
          */
         private String findFileName() {
             String fileName = getDbFeed().getFileName();
-            if (StringUtils.isNullOrEmpty(fileName)) {
+            if (TextUtils.isEmpty(fileName)) {
                 fileName = FileUtils.removeInvalidSeprator(URLUtils.analysisFileName(getDbFeed().getDownloadUrl()));
             }
 

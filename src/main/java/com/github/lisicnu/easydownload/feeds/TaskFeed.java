@@ -1,6 +1,6 @@
 package com.github.lisicnu.easydownload.feeds;
 
-import com.github.lisicnu.libDroid.util.StringUtils;
+import android.text.TextUtils;
 
 /**
  * <p/>
@@ -53,9 +53,9 @@ public class TaskFeed extends BaseFeed {
     }
 
     public boolean isValid() {
-        if (StringUtils.isNullOrEmpty(getSaveDir()) && StringUtils.isNullOrEmpty(getFileName()))
+        if (TextUtils.isEmpty(getSaveDir()) && TextUtils.isEmpty(getFileName()))
             return false;
-        return !StringUtils.isNullOrEmpty(getDownloadUrl());
+        return !TextUtils.isEmpty(getDownloadUrl());
     }
 
 }

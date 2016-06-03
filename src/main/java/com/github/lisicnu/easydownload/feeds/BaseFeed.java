@@ -1,7 +1,9 @@
 package com.github.lisicnu.easydownload.feeds;
 
+import android.text.TextUtils;
+
+import com.github.lisicnu.easydownload.utils.utils;
 import com.github.lisicnu.libDroid.util.ArrayUtils;
-import com.github.lisicnu.libDroid.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -146,7 +148,7 @@ public class BaseFeed {
         StringBuilder builder = new StringBuilder();
         if (items != null) {
             for (String string : items) {
-                if (StringUtils.isNullOrEmpty(string)) continue;
+                if (TextUtils.isEmpty(string)) continue;
 
                 builder.append(string);
                 builder.append(SERVER_SEPARATOR);
@@ -156,10 +158,10 @@ public class BaseFeed {
     }
 
     public static List<String> parseServerToList(String server) {
-        if (StringUtils.isNullOrEmpty(server)) {
+        if (TextUtils.isEmpty(server)) {
             return new ArrayList<String>();
         }
 
-        return StringUtils.split(server, SERVER_SEPARATOR, true);
+        return utils.splitString(server, SERVER_SEPARATOR, true);
     }
 }

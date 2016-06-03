@@ -4,9 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
 import android.util.Log;
-
-import com.github.lisicnu.libDroid.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -153,7 +152,7 @@ public class DBSqliteHelper extends SQLiteOpenHelper {
 
             if (cursor != null && cursor.moveToFirst()) {
                 String sql = cursor.getString(0);
-                if (!StringUtils.isNullOrEmpty(sql)) {
+                if (!TextUtils.isEmpty(sql)) {
                     Iterator<String> ite = maps.keySet().iterator();
                     while (ite.hasNext()) {
                         String st = ite.next() + " ";
